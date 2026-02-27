@@ -1,0 +1,5 @@
+python-telegram-bot==21.6
+tensorflow
+pillow
+numpy
+python-dotenv
