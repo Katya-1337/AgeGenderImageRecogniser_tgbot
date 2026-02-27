@@ -1,4 +1,5 @@
 import os
+import random
 import tempfile
 import logging
 from typing import Tuple, Dict, Any
@@ -22,6 +23,24 @@ GENDER_LABELS = ["male", "female"]
 MAX_IMAGE_SIDE = 2048
 # Фиксированный размер для инференса
 INFERENCE_IMAGE_SIZE = 200
+
+# Фразы пока бот обрабатывает фото (случайный выбор)
+THINKING_PHRASES = [
+    "Не торопись, я думаю...",
+    "Не туплю, а думаю...",
+    "Не скроль мемы, сейчас всё будет.",
+    "Ща, нейросеть грузится...",
+    "Считаю пиксели, не мешай.",
+    "Мозги кипят, подожди секунду.",
+    "Не завис — просто умный.",
+    "Думаю. Да, это редкость.",
+    "Секунду, нейроны шевелю...",
+    "Гружу мозги с диска...",
+    "Обрабатываю... кофе бы.",
+    "Думаю. Даже сам в шоке.",
+    "Подожди, нейросети тоже устают.",
+    "Ща по нейросетевому расписанию.",
+]
 # ----------------------------
 
 logging.basicConfig(
@@ -188,6 +207,8 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text("Пожалуйста, отправь изображение.")
             return
+
+        await update.message.reply_text(random.choice(THINKING_PHRASES))
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
             tmp_path = tmp.name
