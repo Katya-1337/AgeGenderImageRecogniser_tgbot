@@ -105,8 +105,9 @@ def format_classification_prediction(pred: np.ndarray, labels=None) -> str:
         if pred.shape[0] == 1:
             p = float(pred[0])  # вероятность female
             cls = "female" if p >= 0.5 else "male"
+            cls_ru = "женский" if cls == "female" else "мужской"
             percent = (p * 100) if cls == "female" else ((1 - p) * 100)
-            return f"class={cls}, {percent:.0f}%"
+            return f"Предполагаемый пол: {cls_ru}, уверенность модели: {percent:.0f}%"
 
         # multiclass
         best_idx = int(np.argmax(pred))
@@ -147,7 +148,7 @@ def format_age_prediction(pred: np.ndarray) -> str:
     else:
         return f"raw={pred.tolist()}"
 
-    return f"age={age:.0f}"
+    return f"Предполагаемый возраст: {age:.0f} лет"
 
 
 def run_models(image: Image.Image) -> Dict[str, Any]:
@@ -166,7 +167,7 @@ def run_models(image: Image.Image) -> Dict[str, Any]:
 
 async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Привет! Отправь фото, и я прогоню его через 2 Keras-модели."
+        "Привет! Отправь фото, и я проанализирую картинку и верну возраст и пол."
     )
 
 
@@ -198,8 +199,8 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         text = (
             "Результаты:\n\n"
-            f"Agemodel: {results['agemodel']}\n\n"
-            f"Genmodel: {results['genmodel']}"
+            f"{results['agemodel']}\n\n"
+            f"{results['genmodel']}"
         )
         await update.message.reply_text(text)
 
