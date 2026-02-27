@@ -103,9 +103,10 @@ def format_classification_prediction(pred: np.ndarray, labels=None) -> str:
 
     if pred.ndim == 1:
         if pred.shape[0] == 1:
-            p = float(pred[0])
+            p = float(pred[0])  # вероятность female
             cls = "female" if p >= 0.5 else "male"
-            return f"class={cls}, prob={p:.4f}"
+            percent = (p * 100) if cls == "female" else ((1 - p) * 100)
+            return f"class={cls}, {percent:.0f}%"
 
         # multiclass
         best_idx = int(np.argmax(pred))
@@ -171,7 +172,7 @@ async def start_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Просто отправь изображение (как фото или файл), и я верну результаты обеих моделей."
+        "Просто отправь изображение (как фото или файл) — проанализирую картинку и верну возраст и пол."
     )
 
 
@@ -214,6 +215,13 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
 
 
+async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Ответ на текстовые сообщения: бот работает только с фотографиями."""
+    await update.message.reply_text(
+        "Я умею работать только с фотографиями. Загрузите, пожалуйста, изображение."
+    )
+
+
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
@@ -222,6 +230,8 @@ def main():
 
     # Принимаем фото и image-документы
     app.add_handler(MessageHandler(filters.PHOTO | filters.Document.IMAGE, handle_photo))
+    # Обычные сообщения — просим отправить фото
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     app.run_polling()
 
